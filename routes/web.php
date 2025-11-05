@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::resource('clientes', ClienteController::class);
-Route::resource('Autos', AutoController::class);
+Route::resource('autos', AutoController::class);
 
 Route::get('/', function () {
     return view('welcome');
