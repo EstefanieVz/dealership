@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('autos', function (Blueprint $table) {
             $table->id(); 
             $table->string('marca', 255);
-            $table->string('no_serie', 17);
+            $table->string('no_serie', 255);
             $table->string('placas', 255);
             $table->text('descripcion')->nullable();
             $table->decimal('precio', 10, 2);

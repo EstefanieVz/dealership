@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
@@ -10,8 +10,13 @@ class ClienteController extends Controller
     public function index()
     {
         $clientes = Cliente::all();
-        return response()->json($clientes);
+        return view('clientes.index', compact('clientes'));
     }
+    public function create()
+    {
+        return view('clientes.create');
+    }
+
 
     // Crear
     public function store(Request $request)
@@ -27,14 +32,14 @@ class ClienteController extends Controller
         ]);
 
         $cliente = Cliente::create($validated);
-        return response()->json($cliente, 201);
+        return view('clientes.create', compact('clientes'));   
     }
 
-    // Mostrar uno especifico
+    // Mostrar uno espe
     public function show($id)
     {
         $cliente = Cliente::findOrFail($id);
-        return response()->json($cliente);
+        return view('clientes.show', compact('clientes'));    
     }
 
     // Actualizar
@@ -42,8 +47,9 @@ class ClienteController extends Controller
     {
         $cliente = Cliente::findOrFail($id);
         $cliente->update($request->all());
-        return response()->json($cliente);
+        return view('clientes.edit', compact('clientes'));    
     }
+
 
     // Eliminar
     public function destroy($id)

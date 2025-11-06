@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('email', 255)->nullable();
             $table->string('telefono', 255)->nullable();
             $table->string('direccion', 255)->nullable();
-            $table->string('rfc', 13)->nullable();
-            $table->string('licencia_conducir', 12)->default('0');
+            $table->string('rfc', 255)->nullable();
+            $table->string('licencia_conducir', 255)->default('0');
             $table->timestamps();
         });
     }

@@ -2,40 +2,67 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-3">Lista de Autos</h2>
-    <a href="{{ route('autos.create') }}" class="btn btn-primary mb-3">+ Nuevo Auto</a>
+    <h1 class="mb-4">Lista de Autos (Cifrados)</h1>
 
-    <table class="table table-bordered table-striped">
-        <thead>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="{{ route('autos.create') }}" class="btn btn-success">
+            Añadir Auto
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
             <tr>
-                <th>ID</th>
                 <th>Marca</th>
-                <th>No. Serie</th>
-                <th>Placas</th>
+                <th>Descripción</th>
+                <th>No. Serie </th>
+                <th>Placas </th>
+                <th>No. Póliza </th>
                 <th>Precio</th>
                 <th>Stock</th>
-                <th>Acciones</th>
+                <th style="width: 220px;">Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($autos as $auto)
+            @forelse($autos as $auto)
                 <tr>
-                    <td>{{ $auto->id }}</td>
                     <td>{{ $auto->marca }}</td>
-                    <td>{{ $auto->no_serie }}</td>
-                    <td>{{ $auto->placas }}</td>
+                    <td>{{ $auto->descripcion }}</td>
+                    <td class="text-break">{{ $auto->no_serie }}</td> {{-- Cifrado --}}
+                    <td class="text-break">{{ $auto->placas }}</td>   {{-- Cifrado --}}
+                    <td class="text-break">{{ $auto->no_poliza }}</td> {{-- Cifrado --}}
                     <td>${{ number_format($auto->precio, 2) }}</td>
                     <td>{{ $auto->stock }}</td>
                     <td>
-                        <a href="{{ route('autos.show', $auto) }}" class="btn btn-info btn-sm">Ver</a>
-                        <a href="{{ route('autos.edit', $auto) }}" class="btn btn-warning btn-sm">Editar</a>
-                        <form action="{{ route('autos.destroy', $auto) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este auto?')">Eliminar</button>
-                        </form>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {{-- Ver (Descifrar) --}}
+                            <a href="{{ route('autos.show', $auto->id) }}" class="btn btn-info btn-sm">
+                                Ver
+                            </a>
+
+                            {{-- Editar --}}
+                            <a href="{{ route('autos.edit', $auto->id) }}" class="btn btn-warning btn-sm">
+                                Editar
+                            </a>
+
+                            {{-- Eliminar --}}
+                            <form action="{{ route('autos.destroy', $auto->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar este auto?')" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center text-muted">
+                        No hay autos registrados.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
