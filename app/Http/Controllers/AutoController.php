@@ -26,8 +26,8 @@ class AutoController extends Controller
     {
         $request->validate([
             'marca' => 'required|string|max:255',
-            'no_serie' => 'required|string|max:17',
-            'placas' => 'required|string|max:255',
+            'no_serie' => 'required|string|max:255',
+            'placas' => 'required|string|max:17',
             'precio' => 'required|numeric',
             'stock' => 'required|integer',
             'no_poliza' => 'nullable|string|max:255',

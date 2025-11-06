@@ -2,17 +2,16 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2>Detalles del Cliente</h2>
+    <h1>Detalles del Cliente</h1>
 
-    <ul class="list-group mb-3">
-        <li class="list-group-item"><strong>Nombre:</strong> {{ $cliente->nombre }} {{ $cliente->apellidos }}</li>
-        <li class="list-group-item"><strong>Email:</strong> {{ $cliente->email }}</li>
-        <li class="list-group-item"><strong>Teléfono:</strong> {{ $cliente->telefono }}</li>
-        <li class="list-group-item"><strong>Dirección:</strong> {{ $cliente->direccion }}</li>
-        <li class="list-group-item"><strong>RFC:</strong> {{ $cliente->rfc }}</li>
-        <li class="list-group-item"><strong>Licencia:</strong> {{ $cliente->licencia_conducir }}</li>
-    </ul>
-
-    <a href="{{ route('clientes.index') }}" class="btn btn-secondary">Volver</a>
+    <div class="card p-4">
+        <p><strong>Nombre:</strong> {{ $cliente->nombre }} {{ $cliente->apellidos }}</p>
+        <p><strong>Email:</strong> {{ $cliente->email }}</p>
+        <p><strong>Teléfono:</strong> {{ $cliente->telefono }}</p>
+        <p><strong>Dirección:</strong> {{ $cliente->direccion }}</p>
+        <p><strong>RFC:</strong> {{ $decrypted->rfc }}</p>
+        <p><strong>Licencia de Conducir:</strong> {{ $decrypted->licencia_conducir }}</p>
+        <a href="{{ route('clientes.index') }}" class="btn btn-secondary mt-3">Volver</a>
+    </div>
 </div>
 @endsection

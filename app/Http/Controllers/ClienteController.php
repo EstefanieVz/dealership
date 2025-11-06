@@ -1,61 +1,128 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Cliente;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Cliente;
 
 class ClienteController extends Controller
 {
-    // Mostrar todo
+    // Mostrar todos los clientes
     public function index()
     {
         $clientes = Cliente::all();
         return view('clientes.index', compact('clientes'));
     }
+
+    // Mostrar formulario de creación
     public function create()
     {
         return view('clientes.create');
     }
 
-
-    // Crear
+    // Crear cliente
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'nombre' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'telefono' => 'nullable|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:255',
-            'rfc' => 'nullable|string|max:13',
-            'licencia_conducir' => 'nullable|string|max:12',
+            'rfc' => 'required|string|max:20',
+            'licencia_conducir' => 'required|string|max:30',
         ]);
 
-        $cliente = Cliente::create($validated);
-        return view('clientes.create', compact('clientes'));   
+        $key = env('DB_AES_KEY');
+
+        DB::table('clientes')->insert([
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
+            'email' => $request->email,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'rfc' => DB::raw("HEX(AES_ENCRYPT('{$request->rfc}', '{$key}'))"),
+            'licencia_conducir' => DB::raw("HEX(AES_ENCRYPT('{$request->licencia_conducir}', '{$key}'))"),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('clientes.index')->with('success', 'Cliente creado con datos cifrados correctamente.');
     }
 
-    // Mostrar uno espe
+    // Mostrar cliente específico
     public function show($id)
     {
+        $key = env('DB_AES_KEY');
         $cliente = Cliente::findOrFail($id);
-        return view('clientes.show', compact('clientes'));    
+
+        $decrypted = DB::selectOne("
+            SELECT 
+                CAST(AES_DECRYPT(UNHEX(rfc), ?) AS CHAR) AS rfc,
+                CAST(AES_DECRYPT(UNHEX(licencia_conducir), ?) AS CHAR) AS licencia_conducir
+            FROM clientes
+            WHERE id = ?
+        ", [$key, $key, $id]);
+
+        return view('clientes.show', compact('cliente', 'decrypted'));
     }
 
-    // Actualizar
+    // Editar cliente
+    public function edit($id)
+    {
+        $key = env('DB_AES_KEY');
+        $cliente = Cliente::findOrFail($id);
+
+        $decrypted = DB::selectOne("
+            SELECT 
+                CAST(AES_DECRYPT(UNHEX(rfc), ?) AS CHAR) AS rfc,
+                CAST(AES_DECRYPT(UNHEX(licencia_conducir), ?) AS CHAR) AS licencia_conducir
+            FROM clientes
+            WHERE id = ?
+        ", [$key, $key, $id]);
+
+        $cliente->rfc = $decrypted->rfc;
+        $cliente->licencia_conducir = $decrypted->licencia_conducir;
+
+        return view('clientes.edit', compact('cliente'));
+    }
+
+    // Actualizar cliente
     public function update(Request $request, $id)
     {
-        $cliente = Cliente::findOrFail($id);
-        $cliente->update($request->all());
-        return view('clientes.edit', compact('clientes'));    
+         $request->validate([
+            'nombre' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
+            'rfc' => 'required|string|max:20',
+            'licencia_conducir' => 'required|string|max:30',
+        ]);
+
+        $key = env('DB_AES_KEY');
+
+        DB::table('clientes')->where('id', $id)->update([
+            'nombre' => $request->nombre,
+            'apellidos' => $request->apellidos,
+            'email' => $request->email,
+            'telefono' => $request->telefono,
+            'direccion' => $request->direccion,
+            'rfc' => DB::raw("HEX(AES_ENCRYPT('{$request->rfc}', '{$key}'))"),
+            'licencia_conducir' => DB::raw("HEX(AES_ENCRYPT('{$request->licencia_conducir}', '{$key}'))"),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('clientes.index')->with('success', 'Cliente actualizado exitosamente.');
     }
 
-
-    // Eliminar
+    // Eliminar cliente
     public function destroy($id)
     {
         $cliente = Cliente::findOrFail($id);
         $cliente->delete();
-        return response()->json(['message' => 'Cliente eliminado correctamente']);
+        return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');
     }
 }
