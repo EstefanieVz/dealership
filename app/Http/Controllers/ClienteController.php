@@ -8,6 +8,11 @@ use App\Models\Cliente;
 
 class ClienteController extends Controller
 {
+    public function __construct()
+{
+    $this->middleware('auth');
+}
+
     // Mostrar todos los clientes
     public function index()
     {
